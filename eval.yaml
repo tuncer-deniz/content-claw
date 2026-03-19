@@ -1,0 +1,130 @@
+version: "1"
+
+defaults:
+  agent: gemini
+  provider: docker
+  trials: 3
+  timeout: 300
+  threshold: 0.7
+  docker:
+    base: node:20-slim
+
+tasks:
+  - name: content-claw-new-keeper
+    instruction: |
+      I found a great video about AI agent memory systems: https://www.youtube.com/watch?v=dQw4w9WgXcQ&si=tracking123&t=60s. 
+      
+      Please review it against my goals (see USER.md). Since it's highly relevant, I expect it's a "Watch" or "Read" verdict. 
+      
+      Save the review as docs/content-claw/caught/ai-agents--video--ai-memory.md.
+    workspace:
+      - dest: USER.md
+        content: |
+          # User Profile
+          Goals:
+          - Deeply understand AI agent architectures.
+          - Researching long-term memory and context management in LLMs.
+          - Building a personal knowledge base of technical AI insights.
+    graders:
+      - type: deterministic
+        run: |
+          passed=0
+          total=4
+          FILE="docs/content-claw/caught/ai-agents--video--ai-memory.md"
+
+          # 1. Check if file exists
+          if [ -f "$FILE" ]; then
+            passed=$((passed + 1))
+            c1=true
+          else
+            c1=false
+          fi
+
+          # 2. Check for URL sanitization (keep v and t, strip si)
+          if grep -q "v=dQw4w9WgXcQ" "$FILE" && grep -q "t=60s" "$FILE" && ! grep -q "si=tracking123" "$FILE"; then
+            passed=$((passed + 1))
+            c2=true
+          else
+            c2=false
+          fi
+
+          # 3. Check for required Source block header
+          if grep -q "## Source" "$FILE"; then
+            passed=$((passed + 1))
+            c3=true
+          else
+            c3=false
+          fi
+
+          # 4. Check for Verdict
+          if grep -q "Verdict" "$FILE"; then
+            passed=$((passed + 1))
+            c4=true
+          else
+            c4=false
+          fi
+
+          score=$(awk "BEGIN {printf \"%.2f\", $passed/$total}")
+          echo "{\"score\":$score,\"details\":\"$passed/$total checks passed\",\"checks\":[{\"name\":\"exists\",\"passed\":$c1},{\"name\":\"sanitized\",\"passed\":$c2},{\"name\":\"source_block\",\"passed\":$c3},{\"name\":\"verdict_present\",\"passed\":$c4}]}"
+        weight: 0.7
+      - type: llm_rubric
+        rubric: |
+          1. Did the agent correctly identify the content as relevant to the user's AI memory goals?
+          2. Is the verdict formatted correctly (Emoji + Label)?
+          3. Are the "Actions" and "Insights" sections clearly separated and substantive?
+          4. Did the agent follow the file naming convention exactly?
+        weight: 0.3
+
+  - name: content-claw-skip-logic
+    instruction: |
+      Should I spend time on this? https://tabloid.com/celebrity-gossip-2024?utm_source=fb&ref=main. 
+      
+      Check my USER.md first. If it's not relevant, save the review as docs/content-claw/released/skip/culture--article--celebrity-gossip.md.
+    workspace:
+      - dest: USER.md
+        content: |
+          # User Profile
+          Goals:
+          - Focus 100% on Bitcoin engineering and Rust programming.
+          - Strictly avoid celebrity news, gossip, and pop culture.
+          - Time is extremely limited.
+    graders:
+      - type: deterministic
+        run: |
+          passed=0
+          total=3
+          FILE="docs/content-claw/released/skip/culture--article--celebrity-gossip.md"
+
+          # 1. Check if file exists in the 'skip' folder
+          if [ -f "$FILE" ]; then
+            passed=$((passed + 1))
+            c1=true
+          else
+            c1=false
+          fi
+
+          # 2. Check for URL sanitization (strip utm and ref)
+          if grep -q "https://tabloid.com/celebrity-gossip-2024" "$FILE" && ! grep -q "utm_source" "$FILE" && ! grep -q "ref=" "$FILE"; then
+            passed=$((passed + 1))
+            c2=true
+          else
+            c2=false
+          fi
+
+          # 3. Check for Skip verdict
+          if grep -q "⏭️ Skip" "$FILE" || grep -q "Skip" "$FILE"; then
+            passed=$((passed + 1))
+            c3=true
+          else
+            c3=false
+          fi
+
+          score=$(awk "BEGIN {printf \"%.2f\", $passed/$total}")
+          echo "{\"score\":$score,\"details\":\"$passed/$total checks passed\",\"checks\":[{\"name\":\"correct_folder\",\"passed\":$c1},{\"name\":\"sanitized\",\"passed\":$c2},{\"name\":\"skip_verdict\",\"passed\":$c3}]}"
+        weight: 0.7
+      - type: llm_rubric
+        rubric: |
+          1. Did the agent correctly determine that the content should be skipped based on the user's goals?
+          2. Is the reasoning for the "Skip" verdict logical and concise?
+          3. Did the agent include the "Context" in the source block explaining why this was reviewed?
+        weight: 0.3
