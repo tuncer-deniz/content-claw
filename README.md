@@ -1,4 +1,15 @@
-# Content Claw v1.0.0 🦞
+<p align="center">
+  <img src="banner.png" alt="Content Claw" width="100%">
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License"></a>
+  <img src="https://img.shields.io/badge/Built%20for-OpenClaw-blueviolet?style=flat-square" alt="Built for OpenClaw">
+  <a href="https://github.com/tuncer-deniz/content-claw/stargazers"><img src="https://img.shields.io/github/stars/tuncer-deniz/content-claw?style=flat-square" alt="GitHub Stars"></a>
+  <a href="https://x.com/tuncerdeniz"><img src="https://img.shields.io/badge/follow-%40tuncerdeniz-1DA1F2?style=flat-square&logo=x&logoColor=white" alt="Follow @tuncerdeniz"></a>
+</p>
+
+# Content Claw v1.0.0
 
 An [OpenClaw](https://openclaw.ai) skill that saves you hours of content consumption every week.
 
